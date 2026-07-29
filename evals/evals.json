@@ -1,0 +1,141 @@
+{
+  "skill_name": "p-broll",
+  "evals": [
+    {
+      "id": 1,
+      "name": "优先使用 Agent 已集成视频能力",
+      "type": "happy-path",
+      "prompt": "/p-broll 把这句「把重复动作写成流程，经验才第一次留下来」做成拼贴 B-roll。当前 Agent 已经有支持首尾帧和 4–15 秒时长的视频生成工具。",
+      "expected_output": "依次完成隐喻确认与静帧确认；Gate 1 根据动作单元和关系复杂度给出 4–15 秒的 duration_target 与理由。Gate 3 检测到 Agent 已集成能力后匹配不短于目标的时长档位，直接使用且不推荐外部 CLI。生成后保留模型原始视频和原始音轨，不另存无音频版，并完成首尾帧 QA。",
+      "expectations": [
+        "Gate 3 首先检测 Agent 自带或集成的视频能力",
+        "确认工具显式支持首帧和尾帧",
+        "输出可解释的 duration_target 和 duration_reason",
+        "平台离散档位选择不短于目标的最小档位",
+        "不再询问用户安装其他平台 CLI",
+        "不生成 final-noaudio.mp4",
+        "模型原始音轨按原样保留",
+        "生成后执行统一 QA"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "接入用户指定平台 CLI",
+      "type": "happy-path",
+      "prompt": "/p-broll 我常用某视频平台，它没有集成到 Agent，但我能提供官方 CLI。",
+      "expected_output": "询问并读取官方 CLI 安装命令或文档；用 CLI 官方授权方式登录，读取 help 确认首尾帧参数、模型和费用，先提交一条试跑并保存任务 ID，不私自调用网页接口。",
+      "expectations": [
+        "要求用户提供官方 CLI 或官方文档",
+        "以 CLI 实时 help 为准而非猜参数",
+        "CLI 不支持尾帧时停止使用",
+        "核对 CLI 可用时长档位并记录 duration_submitted",
+        "首次扣费前说明消耗并确认"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "没有平台时推荐小云雀",
+      "type": "fallback",
+      "prompt": "/p-broll 我没有常用视频平台，也没有任何 CLI，但愿意注册一个能批量跑的平台。",
+      "expected_output": "推荐小云雀 Seedance 2.0 mini，提供注册链接 https://xiaoyunque.jianying.com/s/z_Wf-ql547E/ 和安装命令 npx @pippit-dev/cli@latest install；明确说明 CLI 使用前需开通最低档位会员，待用户完成后再安装、授权和查实时参数。",
+      "expectations": [
+        "注册链接准确",
+        "CLI 安装命令准确",
+        "提醒开通最低档位会员",
+        "推荐 Seedance 2.0 mini",
+        "不承诺永久免费或固定赠送额度"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "无 CLI 时生成手动包并最终转 HyperFrames",
+      "type": "fallback",
+      "prompt": "/p-broll 我没有 CLI，也不想开小云雀会员。先把我能手动上传网站的材料整理好；如果我还是不会操作，再帮我兜底。",
+      "expected_output": "先计算 4–15 秒动态目标，再生成 manual-generation 目录，包含首帧、尾帧、英文/中文提示词和写明目标时长及理由的 README；建议可在小云雀网页用 Seedance 2.0 mini 与新用户积分。只有用户明确表示连手动生成也无法完成后，才使用 HyperFrames 做刚体组装兜底并说明限制。",
+      "expectations": [
+        "手动包文件齐全且在同一目录",
+        "手动包写明动态时长和判定理由",
+        "先交付手动包，不直接跳 HyperFrames",
+        "手动路线可推荐小云雀注册链接与 Seedance 2.0 mini",
+        "HyperFrames 仅作为最后兜底",
+        "说明 HyperFrames 不擅长形变和碎裂"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "完整讲解片保持平台中立",
+      "type": "happy-path",
+      "prompt": "/p-broll 把「AI 创业里的两种 PMF」做成约 50 秒的拼贴讲解视频，带旁白和字幕。",
+      "expected_output": "先建立带 target_duration 的 8–10 beat beats.json，不在 Gate 1 绑定供应商；每个 beat 独立计算 4–15 秒的 duration_target/reason，并核对预计总长落在目标 ±3 秒内。逐 beat 完成静帧，Gate 3 再匹配平台时长档位。旁白严格按 Agent 内置 TTS、即梦 CLI、其他语音平台或用户回传选择并记录实际 route/platform/model，最后按旁白时长拼装并生成总览 QA。",
+      "expectations": [
+        "Gate 1 不预设视频供应商",
+        "manifest 使用 generation_route/platform/model 字段",
+        "每个 beat 独立记录 duration_target/submitted/reason",
+        "根级 target_duration 控制全片预算且预计总长误差不超过 3 秒",
+        "旁白优先使用当前 Agent 可用 TTS 能力",
+        "Agent 无 TTS 时检查即梦 CLI 的真实帮助，不编造语音命令",
+        "即梦 CLI 无语音能力时转向用户指定的其他语音平台",
+        "完整讲解片才额外生成无音频视频素材",
+        "模型原始视频始终保留",
+        "节奏修改只重拼不重生素材",
+        "批量总览输出使用 video-contact-sheet-all.jpg"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "旁白三级路由与外部平台回传",
+      "type": "fallback",
+      "prompt": "/p-broll 为完整讲解片生成逐段旁白。当前 Agent 没有语音工具，本机 dreamina --help 只有图片和视频命令，我也没有常用语音平台。",
+      "expected_output": "先记录 Agent 无语音能力；读取即梦 CLI 实时帮助，确认没有独立 TTS 后跳过，不猜测命令；再整理逐 beat 文本、统一音色和语气要求，推荐用户选择其他语音平台生成并回传。收到音频后转为统一 WAV，回填 voice_generation_route/platform/model，并在拼装前用 ffprobe 验证。",
+      "expectations": [
+        "严格遵循 Agent 内置 TTS、即梦 CLI、其他平台/用户回传的顺序",
+        "不使用不存在的 dreamina tts 命令",
+        "不硬编码或虚构其他语音平台",
+        "逐 beat 保存 WAV 并记录真实生成信息",
+        "缺少所有语音路线时停止并要求用户提供旁白"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Agent 无生图能力时接入用户图片 CLI",
+      "type": "fallback",
+      "prompt": "/p-broll 当前 Agent 没有图片生成功能，但我有常用图片平台的官方 CLI。",
+      "expected_output": "询问并读取用户提供的官方 CLI 或文档，运行实时 help 确认生图命令、模型、尺寸、参考图和费用；先生成一张试图，不再推荐小云雀或进入 HyperFrames。",
+      "expectations": [
+        "图片路线优先询问用户已有平台 CLI",
+        "以 CLI 实时 help 为准，不猜参数",
+        "首次扣费前确认",
+        "成功后停止向小云雀和 HyperFrames 降级",
+        "下载原图并保存为 last-frame-original.png"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "推荐小云雀并以 HyperFrames 生图兜底",
+      "type": "fallback",
+      "prompt": "/p-broll 当前 Agent 没有生图能力，我也没有图片平台 CLI。优先推荐一个平台；如果我不使用网站，再给我本地兜底。",
+      "expected_output": "先推荐小云雀，提供注册链接和 CLI 安装命令，说明会员/积分以实时页面为准；用户不使用 CLI 时可走网页手动生图。只有用户连小云雀网页也不使用时，才用 HyperFrames 构建确定性 9:16 HTML 拼贴并 snapshot 为 PNG，同时明确不能凭空生成摄影主体。",
+      "expectations": [
+        "提供准确的小云雀注册链接和 CLI 安装命令",
+        "不硬编码未经验证的图片模型或 CLI 参数",
+        "小云雀优先于 HyperFrames",
+        "HyperFrames 使用 snapshot 输出 PNG",
+        "说明 HyperFrames 不是生成式图片模型及其素材限制"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "根据内容复杂度动态判断 4–15 秒",
+      "type": "happy-path",
+      "prompt": "/p-broll 分别处理两句：A「一个纸片落下形成结论」；B「四组纸片依次滑入、展开、建立连接，再发生一次因果转化」。不要让我指定时长，由你判断。",
+      "expected_output": "读取 duration-selection.md，分别拆解动作单元并计算时长。A 应落在 4–5 秒，B 应明显更长并落在约 10–15 秒；两条都输出 duration_target、duration_reason。若平台只有离散档位，选择不短于目标的最小档位并记录 duration_submitted。",
+      "expectations": [
+        "简单内容和复杂内容不使用相同时长",
+        "时长限定在 4–15 秒",
+        "列出动作单元并给出可解释理由",
+        "完成态至少停留 1.2 秒",
+        "超过 15 秒需求时拆 beat 而不是继续延长"
+      ]
+    }
+  ]
+}

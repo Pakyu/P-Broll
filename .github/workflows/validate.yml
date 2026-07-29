@@ -1,0 +1,73 @@
+name: Validate P-Broll
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Python dependencies
+        run: python -m pip install --disable-pip-version-check Pillow PyYAML
+
+      - name: Install Linux media and font dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg xxd fonts-noto-cjk
+
+      - name: Install macOS media dependency
+        if: runner.os == 'macOS'
+        run: command -v ffmpeg >/dev/null || brew install ffmpeg
+
+      - name: Install Windows media dependency
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
+            choco install ffmpeg -y --no-progress
+          }
+
+      - name: Validate metadata, JSON, and Python syntax
+        run: >-
+          python -c "import json, pathlib, py_compile, yaml;
+          root=pathlib.Path('.');
+          text=(root/'SKILL.md').read_text(encoding='utf-8');
+          front=yaml.safe_load(text.split('---', 2)[1]);
+          assert front.get('name') == 'p-broll';
+          assert front.get('description');
+          json.loads((root/'evals/evals.json').read_text(encoding='utf-8'));
+          [py_compile.compile(str(p), doraise=True) for p in (root/'scripts').glob('*.py')]
+          "
+
+      - name: Validate shell syntax
+        if: runner.os != 'Windows'
+        run: bash -n scripts/check_setup.sh scripts/prepare_frames.sh scripts/qa_video.sh
+
+      - name: Run environment check on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/check_setup.ps1
+
+      - name: Run environment check on macOS or Linux
+        if: runner.os != 'Windows'
+        run: bash scripts/check_setup.sh
+
+      - name: Smoke-test Chinese text rendering
+        run: |
+          python scripts/render_caption.py --text "测试字幕" --output caption-smoke.png
+          python scripts/render_headline.py --text "测试标题" --output headline-smoke.png

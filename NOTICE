@@ -1,0 +1,20 @@
+P-Broll
+=======
+
+P-Broll is an adapted and independently maintained workflow distributed under
+the MIT License.
+
+Upstream work
+-------------
+
+- gbro-collage-broll
+  https://github.com/pyang5166/gbro-collage-broll
+  MIT License, Copyright (c) 2026 狗哥笔记
+
+- vox-director
+  https://github.com/Alisa0808/vox-director
+  MIT License, Copyright (c) 2026 Atlas Cloud
+
+P-Broll is not affiliated with, endorsed by, or sponsored by Vox Media or by
+the third-party image, video, voice, CLI, and model providers mentioned in the
+workflow. Their names and trademarks belong to their respective owners.
