@@ -64,6 +64,7 @@ else
 fi
 
 printf 'INFO  Gate 2 图片路由：Agent 图片能力 → 用户平台 CLI → 小云雀 → HyperFrames\n'
+printf 'INFO  Gate 2 静帧必须展示并取得明确确认；改图只能重新纯文生图，禁止参考旧图\n'
 printf 'INFO  Gate 3 将动态检测 Agent 视频能力或平台 CLI，不要求固定 API Key\n'
 printf 'INFO  视频时长：按内容复杂度动态计算 4–15 秒，并匹配不短于目标的平台档位\n'
 printf 'INFO  旁白路由：Agent 内置 TTS → 即梦 CLI（须真实支持 TTS）→ 其他语音平台/用户回传\n'

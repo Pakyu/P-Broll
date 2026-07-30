@@ -1,4 +1,4 @@
 interface:
   display_name: "P-Broll"
   short_description: "把口播做成动态 4–15 秒的首尾帧编辑拼贴 B-roll"
-  default_prompt: "Use $p-broll to turn this spoken line into an editorial paper-collage B-roll clip, determine a justified 4–15 second duration, and choose the best available generation routes."
+  default_prompt: "Use $p-broll to turn this spoken line into an editorial paper-collage B-roll clip, determine a justified 4–15 second duration, show me the generated still for explicit approval, and only then choose a video model with a clear cost confirmation."

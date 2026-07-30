@@ -58,17 +58,28 @@ if (-not $dreamina) {
 }
 if ($dreamina) {
     $dreaminaPath = if ($dreamina.Path) { $dreamina.Path } else { $dreamina.FullName }
-    $dreaminaHelp = (& $dreaminaPath --help 2>&1 | Out-String)
-    if ($dreaminaHelp -match '(?im)\b(tts|text.?to.?speech|speech|voice|narration)\b|语音|配音') {
-        ok "即梦 CLI 检测到可能的语音命令；执行前仍需读取子命令 help"
+    $helpJob = Start-Job -ScriptBlock {
+        param($exe)
+        & $exe --help 2>&1 | Out-String
+    } -ArgumentList $dreaminaPath
+    if (Wait-Job -Job $helpJob -Timeout 8) {
+        $dreaminaHelp = Receive-Job -Job $helpJob | Out-String
+        if ($dreaminaHelp -match '(?im)\b(tts|text.?to.?speech|speech|voice|narration)\b|语音|配音') {
+            ok "即梦 CLI 检测到可能的语音命令；执行前仍需读取子命令 help"
+        } else {
+            warn "即梦 CLI 已安装，但当前 help 未列出独立语音/TTS 命令；旁白路由将转向其他平台"
+        }
     } else {
-        warn "即梦 CLI 已安装，但当前 help 未列出独立语音/TTS 命令；旁白路由将转向其他平台"
+        Stop-Job -Job $helpJob
+        warn "即梦 CLI help 在 8 秒内未返回；跳过语音能力探测，实际使用前再检查"
     }
+    Remove-Job -Job $helpJob -Force
 } else {
     warn "未检测到即梦 CLI；Agent 无语音能力时将推荐其他语音平台"
 }
 
 Write-Host "INFO  Gate 2 图片路由：Agent 图片能力 → 用户平台 CLI → 小云雀 → HyperFrames"
+Write-Host "INFO  Gate 2 静帧必须展示并取得明确确认；改图只能重新纯文生图，禁止参考旧图"
 Write-Host "INFO  Gate 3 将动态检测 Agent 视频能力或平台 CLI，不要求固定 API Key"
 Write-Host "INFO  视频时长：按内容复杂度动态计算 4–15 秒，并匹配不短于目标的平台档位"
 Write-Host "INFO  旁白路由：Agent 内置 TTS → 即梦 CLI（须真实支持 TTS）→ 其他语音平台/用户回传"

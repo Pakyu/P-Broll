@@ -20,6 +20,9 @@ tempo、路径散落在文档和脚本硬编码里。
       "image_generation_route": null,
       "image_generation_platform": null,
       "image_generation_model": null,
+      "gate2_approved": false,
+      "gate2_approved_file": null,
+      "gate2_approval_note": null,
       "generation_route": null,
       "generation_platform": null,
       "generation_model": null,
@@ -62,6 +65,7 @@ tempo、路径散落在文档和脚本硬编码里。
   Gate 2 回填。route 可选 `agent-integrated`、`platform-cli`、
   `xiaoyunque-cli`、`xiaoyunque-web`、`hyperframes`；完整路由见
   `image-generation-routing.md`。
+- **gate2_approved / gate2_approved_file / gate2_approval_note**：图片生成并完成 QA 后，把实际版本展示给用户；只有用户明确同意该文件进入视频生成时才设为 `true`，同时记录相对路径和确认摘要。重生新版本时立即重置为 `false/null/null`，旧版本确认不得继承。
 - **generation_platform / generation_model**：记录实际使用的平台与模型；
   手动生成也要根据用户回传信息尽量补全。拼装层只认 `video` 路径。
 - **duration_target**：Gate 1 按 `duration-selection.md` 计算的 4–15 秒目标。
@@ -88,7 +92,7 @@ tempo、路径散落在文档和脚本硬编码里。
 ## 生命周期
 
 1. Gate 1：写入 title/target_duration/beats（line/role/caption），计算每条 duration_target/reason，并核对全片总时长预算，底色进 brief 讨论
-2. Gate 2：按图片生成路由执行，回填 image generation 字段；过审后由 `prepare_frames.sh` 回填 bg_hex
-3. Gate 3：按视频生成路由执行，回填 duration_submitted、generation_route/platform/model 与 video
+2. Gate 2：按图片生成路由执行，回填 image generation 字段；展示实际静帧并取得明确确认后回填 gate2 approval 字段，再由 `prepare_frames.sh` 回填 bg_hex
+3. Gate 3：先核验 gate2 approval 与实际尾帧一致，再确认模型和费用，按视频生成路由执行并回填 duration_submitted、generation_route/platform/model 与 video
 4. 旁白：按音频生成路由执行，回填 voice generation 字段并确认 `vo` 文件存在
 5. 拼装：`assemble.py --project <dir>` 全自动
