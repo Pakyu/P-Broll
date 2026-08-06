@@ -1,0 +1,50 @@
+{
+  "recommended_threshold": 0.34,
+  "description_required_concepts": [
+    "skill",
+    "source_material",
+    "authoring_action"
+  ],
+  "should_trigger": [
+    {
+      "text": "请用这个 Skill 把口播文稿整理成低多边形动画工作流。",
+      "family": "explicit-skill-and-workflow"
+    },
+    {
+      "text": "帮我优化 P-Broll 这个 Agent Skill，把这段提示词做成纸拼贴 B-roll。",
+      "family": "explicit-optimization"
+    },
+    {
+      "text": "请创建一个 Skill 工作流，把完整选题整理成带审批门禁的短视频画面。",
+      "family": "skill-authoring"
+    }
+  ],
+  "should_not_trigger": [
+    {
+      "text": "帮我把这段中文翻译成英文。",
+      "family": "ordinary-translation"
+    },
+    {
+      "text": "推荐一部好看的低多边形动画电影。",
+      "family": "content-recommendation"
+    },
+    {
+      "text": "帮我计算这条视频的文件大小。",
+      "family": "unrelated-tooling"
+    }
+  ],
+  "near_neighbor": [
+    {
+      "text": "只帮我写一条低多边形视频提示词。",
+      "family": "prompt-only"
+    },
+    {
+      "text": "帮我翻译下面这段 prompt。",
+      "family": "translation-of-prompt"
+    },
+    {
+      "text": "只帮我剪辑一个已经生成的视频，不需要制作 Skill。",
+      "family": "post-production-only"
+    }
+  ]
+}

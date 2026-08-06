@@ -1,0 +1,52 @@
+{
+  "name": "p-broll",
+  "version": "0.2.0",
+  "owner": "Pakyu / P-Broll contributors",
+  "updated_at": "2026-08-06",
+  "status": "development",
+  "maturity_tier": "production",
+  "lifecycle_stage": "local-validation",
+  "upstream_inspiration": "gbro-collage-broll",
+  "secondary_upstream_inspiration": "vox-director",
+  "upstream_sync": {
+    "mode": "semantic-adaptation",
+    "preserve_original_credits": true,
+    "last_reviewed": "2026-08-06"
+  },
+  "intent": {
+    "job_to_be_done": "Turn spoken lines and selected topics into cost-aware, approval-gated paper-collage or low-poly B-roll.",
+    "target_users": [
+      "AI agents producing short-form video",
+      "creators making spoken-line B-roll",
+      "users who need manual video-generation packages"
+    ],
+    "inputs": [
+      "spoken lines, scripts, topics, or beat maps",
+      "optional user-selected image/video platform CLI",
+      "optional user-provided legal media"
+    ],
+    "outputs": [
+      "Gate 1 visual plan with dynamic duration",
+      "approved still frame and prompts",
+      "mode-matched video-generation task or manual package",
+      "original video and QA evidence"
+    ],
+    "exclusions": [
+      "do not use old images as generation references when revising",
+      "do not claim HyperFrames is low-poly 3D generation",
+      "do not commit credentials or provider tokens"
+    ]
+  },
+  "qiaomu_defaults": {
+    "authoring_authority": "qiaomu-meta-skill",
+    "public_claim_policy": "claim only what local validation, install proof, human review, or provider-backed evidence supports",
+    "missing_evidence_label": "missing evidence"
+  },
+  "release_gates": {
+    "skill_validation": "required",
+    "trigger_eval": "required",
+    "secret_scan": "required",
+    "human_or_provider_output_evidence": "required before production claims",
+    "clean_install": "required before public release"
+  }
+}

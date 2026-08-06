@@ -1,0 +1,101 @@
+{
+  "ok": true,
+  "phase": "local",
+  "root": "D:\\CodexFiles\\skills\\p-broll",
+  "version": "0.2.0",
+  "repository": "Pakyu/P-Broll",
+  "summary": {
+    "pass": 5,
+    "warn": 4,
+    "block": 0
+  },
+  "gates": [
+    {
+      "gate": "package_validation",
+      "status": "pass",
+      "evidence": {
+        "ok": true,
+        "root": "D:\\CodexFiles\\skills\\p-broll",
+        "failures": [],
+        "warnings": []
+      }
+    },
+    {
+      "gate": "version_and_report_consistency",
+      "status": "pass",
+      "evidence": {
+        "ok": true,
+        "failures": [],
+        "evidence": {
+          "manifest_name": "p-broll",
+          "manifest_version": "0.2.0",
+          "skill_ir_name": "p-broll",
+          "skill_ir_version": "0.2.0",
+          "trigger_ok": true,
+          "trigger_summary": {
+            "total": 9,
+            "passed": 9,
+            "false_positive": 0,
+            "false_negative": 0,
+            "pass_rate": 1.0
+          }
+        }
+      }
+    },
+    {
+      "gate": "secret_scan",
+      "status": "pass",
+      "evidence": {
+        "findings": []
+      }
+    },
+    {
+      "gate": "git_diff_check",
+      "status": "pass",
+      "evidence": {
+        "ok": true,
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "gate": "feature_branch",
+      "status": "pass",
+      "evidence": {
+        "branch": "agent/p-broll-low-poly-qiaomu"
+      }
+    },
+    {
+      "gate": "clean_worktree",
+      "status": "warn",
+      "evidence": {
+        "dirty": true
+      }
+    },
+    {
+      "gate": "unit_tests",
+      "status": "warn",
+      "evidence": {
+        "missing_evidence": "rerun with --run-tests"
+      }
+    },
+    {
+      "gate": "clean_install",
+      "status": "warn",
+      "evidence": {
+        "missing_evidence": "rerun with --install-check after the target revision is remote"
+      }
+    },
+    {
+      "gate": "provider_or_human_output_evidence",
+      "status": "warn",
+      "evidence": {
+        "path": "reports\\output-evidence.json",
+        "evidence_kind": "local_script_test",
+        "ok": true,
+        "missing_evidence": "recorded fixtures or behavior specifications are not provider/human evidence"
+      }
+    }
+  ]
+}

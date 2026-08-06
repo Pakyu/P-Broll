@@ -1,0 +1,134 @@
+{
+  "ok": true,
+  "threshold": 0.34,
+  "description_concepts": [
+    "authoring_action",
+    "skill",
+    "source_material"
+  ],
+  "missing_description_concepts": [],
+  "summary": {
+    "total": 9,
+    "passed": 9,
+    "false_positive": 0,
+    "false_negative": 0,
+    "pass_rate": 1.0
+  },
+  "failures": [],
+  "results": {
+    "should_trigger": [
+      {
+        "prompt": "请用这个 Skill 把口播文稿整理成低多边形动画工作流。",
+        "family": "explicit-skill-and-workflow",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 1.0,
+        "matched_concepts": [
+          "authoring_action",
+          "skill",
+          "source_material"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "帮我优化 P-Broll 这个 Agent Skill，把这段提示词做成纸拼贴 B-roll。",
+        "family": "explicit-optimization",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 1.0,
+        "matched_concepts": [
+          "authoring_action",
+          "skill",
+          "source_material"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "请创建一个 Skill 工作流，把完整选题整理成带审批门禁的短视频画面。",
+        "family": "skill-authoring",
+        "expected_trigger": true,
+        "predicted_trigger": true,
+        "passed": true,
+        "score": 1.0,
+        "matched_concepts": [
+          "authoring_action",
+          "skill",
+          "source_material"
+        ],
+        "negative_pattern": null
+      }
+    ],
+    "should_not_trigger": [
+      {
+        "prompt": "帮我把这段中文翻译成英文。",
+        "family": "ordinary-translation",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.0,
+        "matched_concepts": [],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "推荐一部好看的低多边形动画电影。",
+        "family": "content-recommendation",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.0,
+        "matched_concepts": [],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "帮我计算这条视频的文件大小。",
+        "family": "unrelated-tooling",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.0,
+        "matched_concepts": [],
+        "negative_pattern": null
+      }
+    ],
+    "near_neighbor": [
+      {
+        "prompt": "只帮我写一条低多边形视频提示词。",
+        "family": "prompt-only",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.333,
+        "matched_concepts": [
+          "source_material"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "帮我翻译下面这段 prompt。",
+        "family": "translation-of-prompt",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.333,
+        "matched_concepts": [
+          "source_material"
+        ],
+        "negative_pattern": null
+      },
+      {
+        "prompt": "只帮我剪辑一个已经生成的视频，不需要制作 Skill。",
+        "family": "post-production-only",
+        "expected_trigger": false,
+        "predicted_trigger": false,
+        "passed": true,
+        "score": 0.333,
+        "matched_concepts": [
+          "skill"
+        ],
+        "negative_pattern": null
+      }
+    ]
+  }
+}
