@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 
 
 ACTION_SECONDS = {
@@ -39,12 +40,18 @@ def parse_platform_durations(value: str | None) -> list[int]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--frame-mode",
+        choices=("first-last", "single-first"),
+        default="first-last",
+        help="first-last for collage assembly; single-first for low-poly image-to-video",
+    )
     parser.add_argument("--simple", type=int, default=0, help="Simple action units")
     parser.add_argument("--coordinated", type=int, default=0, help="Coordinated action units")
     parser.add_argument("--transform", type=int, default=0, help="Transform action units")
     parser.add_argument("--relation", choices=RELATION_SECONDS, default="none")
-    parser.add_argument("--complex-scene", action="store_true", help="Use a longer empty hold")
-    parser.add_argument("--end-hold", type=float, default=None, help="Override final hold, 1.2-2.0s")
+    parser.add_argument("--complex-scene", action="store_true", help="Use a longer opening hold")
+    parser.add_argument("--end-hold", type=float, default=None, help="Override final stabilization hold")
     parser.add_argument("--user-duration", type=int, default=None, help="Explicit user duration, 4-15s")
     parser.add_argument("--platform-durations", default=None, help="Available slots, e.g. 5,10,15")
     args = parser.parse_args()
@@ -54,21 +61,32 @@ def main() -> int:
             parser.error(f"--{name} 不能为负数")
     if args.user_duration is not None and not 4 <= args.user_duration <= 15:
         parser.error("--user-duration 必须在 4–15 秒之间")
-    if args.end_hold is not None and not 1.2 <= args.end_hold <= 2.0:
-        parser.error("--end-hold 必须在 1.2–2.0 秒之间")
+    if args.end_hold is not None:
+        hold_range = (1.2, 2.0) if args.frame_mode == "first-last" else (0.8, 1.5)
+        if not hold_range[0] <= args.end_hold <= hold_range[1]:
+            parser.error(
+                f"--end-hold 在 {args.frame_mode} 模式下必须位于 "
+                f"{hold_range[0]:.1f}–{hold_range[1]:.1f} 秒"
+            )
 
     try:
         platform_durations = parse_platform_durations(args.platform_durations)
     except argparse.ArgumentTypeError as exc:
         parser.error(str(exc))
     action_units = args.simple + args.coordinated + args.transform
-    empty_hold = 0.8 if args.complex_scene else 0.5
+    if args.frame_mode == "first-last":
+        initial_hold = 0.8 if args.complex_scene else 0.5
+    else:
+        initial_hold = 0.6 if args.complex_scene else 0.3
     end_hold = args.end_hold
     if end_hold is None:
-        end_hold = 2.0 if args.relation == "complex" or action_units >= 5 else 1.2
+        if args.frame_mode == "first-last":
+            end_hold = 2.0 if args.relation == "complex" or action_units >= 5 else 1.2
+        else:
+            end_hold = 1.2 if args.relation == "complex" or action_units >= 5 else 0.8
 
     calculated_raw = (
-        empty_hold
+        initial_hold
         + args.simple * ACTION_SECONDS["simple"]
         + args.coordinated * ACTION_SECONDS["coordinated"]
         + args.transform * ACTION_SECONDS["transform"]
@@ -106,16 +124,22 @@ def main() -> int:
             platform_insufficient = True
 
     result = {
+        "frame_mode": args.frame_mode,
         "duration_target": target_duration,
         "duration_submitted": duration_submitted,
         "duration_reason": reason,
-        "empty_hold": empty_hold,
+        "initial_hold": initial_hold,
+        "empty_hold": initial_hold if args.frame_mode == "first-last" else None,
         "end_hold": end_hold,
         "raw_duration": round(raw_duration, 2),
         "needs_split": needs_split,
         "user_duration_insufficient": bool(args.user_duration is not None and needs_split),
         "platform_insufficient": platform_insufficient,
     }
+    # Windows runners may default to cp1252; keep the Chinese reason field
+    # printable instead of failing after the duration calculation succeeds.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 

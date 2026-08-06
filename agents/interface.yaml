@@ -1,0 +1,44 @@
+interface:
+  display_name: "P-Broll"
+  short_description: "把口播做成 4–15 秒纸拼贴或低多边形 B-roll"
+  default_prompt: "使用 $p-broll 把这句口播做成纸拼贴或低多边形 B-roll，先判断 frame_mode 和 4–15 秒时长，生成并展示静帧等待明确确认，再确认视频模型与费用。"
+
+compatibility:
+  canonical_format: "Agent Skill package with SKILL.md, references, scripts, evals, and release metadata"
+  adapter_targets:
+    - openai
+    - claude
+    - generic
+    - agent-skills-compatible
+  activation:
+    natural_language: true
+    explicit_skill_name: "$p-broll"
+    trigger_terms:
+      - 纸拼贴 B-roll
+      - 半调拼贴动画
+      - 低多边形动画
+      - 单首帧图生视频
+      - 给口播配画面
+  execution:
+    requires_explicit_still_approval: true
+    requires_cost_confirmation_before_paid_video: true
+    supports_frame_modes:
+      - first-last
+      - single-first
+
+  trust:
+    user_confirmation_gate: "Gate 2 approval is required for the exact current still file"
+    image_revision_policy: "text-to-image only; never use an old or derived image as reference"
+    provider_policy: "inspect live provider capability and cost; do not invent CLI parameters"
+  permissions:
+    external_network: "only through user-selected or Agent-integrated providers"
+    paid_generation: "requires explicit model, duration, and cost confirmation"
+    credentials: "never write API keys, cookies, tokens, or passwords to project files"
+  degradation:
+    no_image_provider: "collage may use HyperFrames; low-poly waits for a generative image route or user-provided result"
+    no_video_provider: "create a mode-matched manual-generation package"
+
+gates:
+  gate1: "visual metaphor, theme, frame_mode, action units, and dynamic duration"
+  gate2: "generate and show the exact approved still; stop until explicit approval"
+  gate3: "use first-last for collage or single-first for low-poly, confirm cost, generate, and run mode-aware QA"

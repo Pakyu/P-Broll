@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "evidence_kind": "local_script_test",
+  "missing_evidence": [
+    "provider_backed_low_poly_video_run",
+    "human_blind_review",
+    "clean_isolated_install"
+  ],
+  "validated": [
+    "python metadata and syntax validation",
+    "single-first duration selection",
+    "single-first manual package without last-frame.png",
+    "single-first first-frame similarity QA",
+    "single-beat overview generation",
+    "first-last compatibility smoke test"
+  ]
+}

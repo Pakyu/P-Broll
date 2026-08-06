@@ -1,6 +1,8 @@
 # 图片生成路由
 
-Gate 2 生成最终静帧时读取本文件。一旦某级可用就停止向下寻找。
+Gate 2 生成确认静帧时读取本文件。一旦某级可用就停止向下寻找。先根据主题确定
+`frame_mode`：十套拼贴主题为 `first-last`；低多边形动画为 `single-first`，
+并额外读取 `low-poly-animation.md`。
 
 ## 目录
 
@@ -14,7 +16,8 @@ Gate 2 生成最终静帧时读取本文件。一旦某级可用就停止向下�
 ## 1. 通用输出要求
 
 - 输出 9:16 PNG，目标 1080×1920；平台只支持相近尺寸时保留原图并记录实际尺寸。
-- 最终文件保存为 `<item>/frames/last-frame-original.png`。
+- `first-last`：完成态静帧保存为 `<item>/frames/last-frame-original.png`。
+- `single-first`：起始首帧保存为 `<item>/frames/first-frame-original.png`，不生成尾帧。
 - 完整 prompt 保存为 `<item>/imagegen-prompt.txt`。
 - 禁止可读文字、数字、logo、水印、UI、字幕和未经授权的品牌素材。
 - 首次付费或扣积分前展示平台、模型、尺寸、张数和预计消耗并征得用户确认。
@@ -22,7 +25,7 @@ Gate 2 生成最终静帧时读取本文件。一旦某级可用就停止向下�
 - CLI 提供多个模型时，先询问用户是否指定；没有偏好时再结合平台当前价格、能力和本项目画面需求推荐。
 - 推荐候选仅在平台实时列表确实存在时使用：**Seedream 5.0 Pro、NanoBanana、GPT Image 2**。不要假设型号一定可用，也不要把候选顺序伪装成固定质量或价格排名。
 - 费用无法从 CLI 或官方页面可靠核实时，明确标记“费用未知”；只有用户明确接受未知消耗后才提交。
-- 所有生成式图片调用都采用纯文生图。不得把已生成图片或其派生图作为后续生图输入；同批风格一致性通过完整文字规范、色板和构图参数维持。HyperFrames 仅作为初始静帧的非生成式兜底，不能用于修改已经展示过的图片。
+- 所有生成式图片调用都采用纯文生图。不得把已生成图片或其派生图作为后续生图输入；同批风格一致性通过完整文字规范、色板和构图参数维持。HyperFrames 仅作为拼贴初始静帧的非生成式兜底，不能用于修改已经展示过的图片，也不能冒充低多边形 3D 生图。
 
 ## 2. 一级：Agent 自带或集成图片能力
 
@@ -73,13 +76,13 @@ npx @pippit-dev/cli@latest install
 2. 读取 CLI 实时帮助，确认当前纯文生图命令、可用模型、尺寸、下载参数和模型费用。
 3. 有多个模型时先问用户是否指定。用户没有想法时，只在实时存在的模型中优先考察 Seedream 5.0 Pro、NanoBanana、GPT Image 2，再依据价格与画面需求提出一个建议。
 4. 展示模型、尺寸、张数和预计积分/费用，取得确认后只提交文字 prompt，先生成一张 9:16 试图；费用未知时必须明确说明并单独取得接受。
-5. 完成后下载原始 PNG/JPEG。若原件是 JPEG，必须用 Pillow、ffmpeg 或系统图片工具实际转码为 PNG，再保存为 `last-frame-original.png`；不得只修改扩展名。
+5. 完成后下载原始 PNG/JPEG。若原件是 JPEG，必须用 Pillow、ffmpeg 或系统图片工具实际转码为 PNG，再按 `frame_mode` 保存为 `last-frame-original.png` 或 `first-frame-original.png`；不得只修改扩展名。
 
 用户不使用 CLI 时，可把 `imagegen-prompt.txt` 交给用户在小云雀网页手动生成；仍提供注册链接。网页会员条件、模型和免费积分以页面实时显示为准。用户回传原图后再进入 Gate 2 QA。
 
 ## 5. 四级：HyperFrames 最终兜底
 
-仅在 Agent 没有图片能力、用户没有可用平台 CLI，且不使用小云雀网页时进入。使用已安装的 `hyperframes` Skill 和当前 HyperFrames CLI。
+仅在 Agent 没有图片能力、用户没有可用平台 CLI，且不使用小云雀网页时进入。使用已安装的 `hyperframes` Skill 和当前 HyperFrames CLI。此路线只适用于十套拼贴主题；低多边形模式没有合格生成式生图路线时，应交付首帧 prompt 等待用户在网站生成或回传，不进入 HyperFrames。
 
 HyperFrames 是确定性 HTML 合成，不是生成式图片模型。它能可靠完成：
 
@@ -113,10 +116,10 @@ npx hyperframes snapshot <item>/hyperframes-still \
 无论图片来自 Agent、平台 CLI、小云雀网页还是 HyperFrames，都执行：
 
 1. 保留供应商原图或 HyperFrames composition 源文件。
-2. 标准交付路径使用 `<item>/frames/last-frame-original.png`。
-3. 检查尺寸、隐喻、构图、色场、纸张质感、假字、logo、水印、UI 和主体组数。
+2. 标准交付路径由 `frame_mode` 决定：拼贴为 `last-frame-original.png`，低多边形为 `first-frame-original.png`。
+3. 拼贴检查尺寸、隐喻、构图、色场、纸张质感和主体组数；低多边形按 `low-poly-animation.md` 检查三角切面、人物/物体结构、灰阶红色体系、动作起点和镜头运动空间。两种模式都检查假字、logo、水印和 UI。
 4. 把实际图片展示给用户，明确询问是否批准该版本进入视频生成。把获准文件名和用户确认内容写入 `gate2-qa.md`；没有明确确认就停止在 Gate 2。
 5. 用户要求修改时，保留旧版本，把反馈合并进一份全新的完整 prompt，使用纯文生图重新生成新版本。禁止使用旧图、裁剪图、截图、蒙版、控制图或任何派生图进行 image-to-image、局部重绘、扩图或参考图修改。
 6. 当前路线不能纯文生图时，切换到可纯文生图的路线；没有可用路线时报告阻塞。HyperFrames 初始兜底图被要求修改时，也不得编辑旧 composition 或基于旧图修改，必须转纯文生图路线重新生成。
 7. 每个新版本都重新 QA、展示并确认；旧版本确认不得继承。完整讲解片回填 `gate2_approved=true`、`gate2_approved_file` 和 `gate2_approval_note`。
-8. HyperFrames 路线额外记录素材来源和视觉降级说明。
+8. HyperFrames 路线额外记录素材来源和视觉降级说明；不得用于完成低多边形模式。

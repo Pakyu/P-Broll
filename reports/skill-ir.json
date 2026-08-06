@@ -1,0 +1,157 @@
+{
+  "schema_version": "2.0.0-qiaomu-lite",
+  "generated_at": "2026-08-06",
+  "package": {
+    "name": "p-broll",
+    "version": "0.2.0",
+    "owner": "Pakyu / P-Broll contributors",
+    "maturity_tier": "production",
+    "lifecycle_stage": "local-validation",
+    "upstream_inspiration": "gbro-collage-broll",
+    "upstream_sync": {
+      "mode": "semantic-adaptation",
+      "preserve_original_credits": true,
+      "last_reviewed": "2026-08-06"
+    }
+  },
+  "intent": {
+    "description": "这是一个可复用的 Agent Skill 工作流，用于创建、整理和优化口播 B-roll 与完整讲解片。它支持十套纸拼贴主题的空首帧+完成态尾帧组装动画，以及低多边形动画的单首帧图生视频；支持动态 4–15 秒单句、批量 B-roll 和 beat map 驱动的 45–60 秒讲解片。根据动作与关系复杂度判断时长，静帧按 Agent 图片能力、用户平台 CLI、小云雀、HyperFrames 动态路由，视频按 Agent 能力、平台 CLI、小云雀、手动包、HyperFrames 动态路由，旁白按 Agent 内置 TTS、即梦 CLI、其他语音平台动态路由。严格要求静帧经用户明确确认后才进入付费视频生成，图片修改只能重新文生图且禁止把旧图作为参考图。用户提到拼贴 B-roll、纸拼贴视频、半调拼贴动画、低多边形动画、单首帧图生视频、给口播配画面、动态判断视频时长、把选题视频化、整理工作流或优化 Skill 时使用。",
+    "job_to_be_done": "Turn spoken lines and selected topics into cost-aware, approval-gated paper-collage or low-poly B-roll.",
+    "target_users": [
+      "AI agents producing short-form video",
+      "creators making spoken-line B-roll",
+      "users who need manual video-generation packages"
+    ],
+    "inputs": [
+      "spoken lines, scripts, topics, or beat maps",
+      "optional user-selected image/video platform CLI",
+      "optional user-provided legal media"
+    ],
+    "outputs": [
+      "Gate 1 visual plan with dynamic duration",
+      "approved still frame and prompts",
+      "mode-matched video-generation task or manual package",
+      "original video and QA evidence"
+    ],
+    "exclusions": [
+      "do not use old images as generation references when revising",
+      "do not claim HyperFrames is low-poly 3D generation",
+      "do not commit credentials or provider tokens"
+    ],
+    "qiaomu_defaults": {
+      "authoring_authority": "qiaomu-meta-skill",
+      "public_claim_policy": "claim only what local validation, install proof, human review, or provider-backed evidence supports",
+      "missing_evidence_label": "missing evidence"
+    }
+  },
+  "triggers": {
+    "should_trigger": [
+      "请用这个 Skill 把口播文稿整理成低多边形动画工作流。",
+      "帮我优化 P-Broll 这个 Agent Skill，把这段提示词做成纸拼贴 B-roll。",
+      "请创建一个 Skill 工作流，把完整选题整理成带审批门禁的短视频画面。"
+    ],
+    "should_not_trigger": [
+      "帮我把这段中文翻译成英文。",
+      "推荐一部好看的低多边形动画电影。",
+      "帮我计算这条视频的文件大小。"
+    ],
+    "near_neighbor": [
+      "只帮我写一条低多边形视频提示词。",
+      "帮我翻译下面这段 prompt。",
+      "只帮我剪辑一个已经生成的视频，不需要制作 Skill。"
+    ]
+  },
+  "workflow": {
+    "router_rules": [],
+    "compact_workflow": [],
+    "gate_ladder": [],
+    "output_contract": []
+  },
+  "resources": {
+    "references": [
+      "references\\audio-generation-routing.md",
+      "references\\beats-manifest.md",
+      "references\\duration-selection.md",
+      "references\\image-generation-routing.md",
+      "references\\low-poly-animation.md",
+      "references\\narrative-arcs.md",
+      "references\\theme-presets.md",
+      "references\\video-generation-routing.md"
+    ],
+    "scripts": [
+      "scripts\\assemble.py",
+      "scripts\\create_manual_package.py",
+      "scripts\\font_utils.py",
+      "scripts\\overview.py",
+      "scripts\\qa_score.py",
+      "scripts\\render_caption.py",
+      "scripts\\render_headline.py",
+      "scripts\\select_duration.py"
+    ],
+    "evals": [
+      "evals\\evals.json",
+      "evals\\trigger_cases.json"
+    ],
+    "reports": [
+      "reports\\creation-handoff.md",
+      "reports\\output-evidence.json",
+      "reports\\prior-art-research.md",
+      "reports\\qiaomu-release-local.json",
+      "reports\\skill-ir.json",
+      "reports\\trigger-eval.json"
+    ]
+  },
+  "portability": {
+    "canonical_format": "Agent Skill package with SKILL.md, references, scripts, evals, and release metadata",
+    "adapter_targets": [
+      "openai",
+      "claude",
+      "generic",
+      "agent-skills-compatible"
+    ],
+    "activation": {
+      "natural_language": true,
+      "explicit_skill_name": "$p-broll",
+      "trigger_terms": [
+        "纸拼贴 B-roll",
+        "半调拼贴动画",
+        "低多边形动画",
+        "单首帧图生视频",
+        "给口播配画面"
+      ]
+    },
+    "execution": {
+      "requires_explicit_still_approval": true,
+      "requires_cost_confirmation_before_paid_video": true,
+      "supports_frame_modes": [
+        "first-last",
+        "single-first"
+      ]
+    },
+    "trust": {
+      "user_confirmation_gate": "Gate 2 approval is required for the exact current still file",
+      "image_revision_policy": "text-to-image only; never use an old or derived image as reference",
+      "provider_policy": "inspect live provider capability and cost; do not invent CLI parameters"
+    },
+    "permissions": {
+      "external_network": "only through user-selected or Agent-integrated providers",
+      "paid_generation": "requires explicit model, duration, and cost confirmation",
+      "credentials": "never write API keys, cookies, tokens, or passwords to project files"
+    },
+    "degradation": {
+      "no_image_provider": "collage may use HyperFrames; low-poly waits for a generative image route or user-provided result",
+      "no_video_provider": "create a mode-matched manual-generation package"
+    }
+  },
+  "gates": {
+    "gate1": "visual metaphor, theme, frame_mode, action units, and dynamic duration",
+    "gate2": "generate and show the exact approved still; stop until explicit approval",
+    "gate3": "use first-last for collage or single-first for low-poly, confirm cost, generate, and run mode-aware QA"
+  },
+  "evidence_boundary": {
+    "generated_reports_are_evidence": true,
+    "planned_work_is_evidence": false,
+    "missing_external_or_human_evidence_label": "missing evidence",
+    "public_claim_policy": "claim only what local validation, install proof, human review, or provider-backed evidence actually supports"
+  }
+}

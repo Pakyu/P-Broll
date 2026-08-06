@@ -57,8 +57,14 @@ jobs:
           assert 'gate2_approved' in policy;
           assert 'Seedance 1.5 Pro' in policy;
           assert 'Seedream 5.0 Pro' in policy and 'NanoBanana' in policy and 'GPT Image 2' in policy;
-          assert 'image-to-image' in policy
+          assert 'image-to-image' in policy;
+          assert 'low-poly-animation' in policy and 'single-first' in policy
           "
+
+      - name: Smoke-test both frame modes
+        run: |
+          python scripts/select_duration.py --frame-mode first-last --simple 2 --coordinated 1 --relation simple --platform-durations 5,10,15
+          python scripts/select_duration.py --frame-mode single-first --simple 2 --coordinated 1 --relation simple --platform-durations 5,10,15
 
       - name: Validate shell syntax
         if: runner.os != 'Windows'

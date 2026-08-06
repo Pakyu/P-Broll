@@ -170,6 +170,23 @@
         "视频模型优先 Seedance 1.5 Pro、其次 Seedance 2.0",
         "费用未知时取得明确接受后才提交"
       ]
+    },
+    {
+      "id": 12,
+      "name": "低多边形动画使用单首帧流程",
+      "type": "happy-path",
+      "prompt": "/p-broll 用低多边形动画处理这句：团队需要先排查混元大模型，再决定是否扩大训练。请按参考风格生成视频。",
+      "expected_output": "识别低多边形动画为独立非拼贴模式，写入 theme=low-poly-animation 与 frame_mode=single-first。Gate 2 使用纯文生图生成黑白灰、红色强调、三角切面的起始首帧并展示，取得用户对当前版本的明确批准。Gate 3 不运行 prepare_frames、不生成或上传尾帧，选择支持单图 image-to-video 的平台，使用首帧与低多边形动画 prompt 生成视频；提交前确认模型、时长和费用，完成首帧相似度及低多边形稳定性 QA。",
+      "expectations": [
+        "将低多边形动画与十套拼贴主题明确区分",
+        "设置 theme=low-poly-animation 和 frame_mode=single-first",
+        "Gate 2 生成并确认 first-frame-original.png",
+        "不运行 prepare_frames 且不生成尾帧",
+        "只支持单图图生视频的平台在本模式下可用",
+        "动画提示词包含主体动作、镜头运动和低多边形稳定约束",
+        "QA 对照真实首帧而不是尾帧",
+        "低多边形模式不使用 HyperFrames 冒充 3D 动画"
+      ]
     }
   ]
 }

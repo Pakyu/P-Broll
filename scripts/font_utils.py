@@ -8,6 +8,9 @@ from pathlib import Path
 
 from PIL import ImageFont
 
+# Qiaomu validator marker: imported helper, not a standalone user-facing script.
+SCRIPT_INTERFACE = "internal-module"
+
 
 REGULAR_CANDIDATES = [
     (r"C:\Windows\Fonts\msyh.ttc", 0),
