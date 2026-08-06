@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 
 
 ACTION_SECONDS = {
@@ -135,6 +136,10 @@ def main() -> int:
         "user_duration_insufficient": bool(args.user_duration is not None and needs_split),
         "platform_insufficient": platform_insufficient,
     }
+    # Windows runners may default to cp1252; keep the Chinese reason field
+    # printable instead of failing after the duration calculation succeeds.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 
